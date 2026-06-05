@@ -1,7 +1,11 @@
 import { Client } from '@stomp/stompjs';
 import SockJS from 'sockjs-client';
+import { Platform } from 'react-native';
 
-const WS_URL = 'http://10.0.2.2:8080/ws';  // Change for physical device
+const WS_URL =
+  Platform.OS === 'web'
+    ? 'http://localhost:8080/ws'
+    : 'http://10.0.2.2:8080/ws';
 
 let stompClient = null;
 const subscribers = {};

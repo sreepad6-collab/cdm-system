@@ -1,7 +1,11 @@
 import axios from 'axios';
+import { Platform } from 'react-native';
 
-// Change this to your backend IP when running on a physical device
-const BASE_URL = 'http://10.0.2.2:8080/api';  // Android emulator -> localhost
+// Web (Chrome) uses localhost; Android emulator uses 10.0.2.2
+const BASE_URL =
+  Platform.OS === 'web'
+    ? 'http://localhost:8080/api'
+    : 'http://10.0.2.2:8080/api';
 
 const api = axios.create({
   baseURL: BASE_URL,

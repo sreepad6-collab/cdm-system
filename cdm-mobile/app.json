@@ -17,6 +17,10 @@
     },
     "ios": {
       "bundleIdentifier": "com.cdm.mobile"
+    },
+    "web": {
+      "favicon": "./assets/icon.png",
+      "bundler": "metro"
     }
   }
 }
