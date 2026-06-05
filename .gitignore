@@ -2,3 +2,5 @@ cdm-backend/target/
 cdm-mobile/node_modules/
 cdm-mobile/.expo/
 *.env
+*.log
+*.log.err
