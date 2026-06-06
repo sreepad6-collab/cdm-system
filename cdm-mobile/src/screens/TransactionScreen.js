@@ -4,7 +4,6 @@ import {
   Alert, ActivityIndicator, ScrollView, KeyboardAvoidingView, Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { Picker } from '@react-native-picker/picker';
 import { fetchMachines, processTransaction } from '../services/api';
 
 const QUICK_AMOUNTS = [5000, 10000, 20000, 50000, 100000];
@@ -106,20 +105,21 @@ export default function TransactionScreen() {
         {/* Machine selector */}
         <View style={styles.card}>
           <Text style={styles.label}>Select CDM Machine</Text>
-          <View style={styles.pickerWrapper}>
-            <Picker
-              selectedValue={selectedCode}
-              onValueChange={setSelectedCode}
-              style={styles.picker}
-            >
-              {machines.map(m => (
-                <Picker.Item
-                  key={m.machineCode}
-                  label={`${m.machineCode} — ${m.location}`}
-                  value={m.machineCode}
-                />
-              ))}
-            </Picker>
+          <View style={styles.machineList}>
+            {machines.map(m => (
+              <TouchableOpacity
+                key={m.machineCode}
+                style={[styles.machineOption, selectedCode === m.machineCode && styles.machineOptionActive]}
+                onPress={() => setSelectedCode(m.machineCode)}
+              >
+                <Text style={[styles.machineOptionCode, selectedCode === m.machineCode && { color: '#fff' }]}>
+                  {m.machineCode}
+                </Text>
+                <Text style={[styles.machineOptionLoc, selectedCode === m.machineCode && { color: '#c5cae9' }]}>
+                  {m.location}
+                </Text>
+              </TouchableOpacity>
+            ))}
           </View>
 
           {/* Machine balance preview */}
@@ -264,8 +264,14 @@ const styles = StyleSheet.create({
     elevation: 2, shadowColor: '#000', shadowOpacity: 0.07, shadowRadius: 3,
   },
   label: { fontSize: 12, fontWeight: '600', color: '#888', marginBottom: 6, textTransform: 'uppercase' },
-  pickerWrapper: { borderWidth: 1, borderColor: '#eee', borderRadius: 8, overflow: 'hidden' },
-  picker: { height: 48 },
+  machineList: { gap: 8 },
+  machineOption: {
+    borderWidth: 1.5, borderColor: '#e0e0e0', borderRadius: 10,
+    padding: 12, backgroundColor: '#fafafa',
+  },
+  machineOptionActive: { backgroundColor: '#1a237e', borderColor: '#1a237e' },
+  machineOptionCode: { fontSize: 14, fontWeight: '700', color: '#1a237e' },
+  machineOptionLoc: { fontSize: 12, color: '#888', marginTop: 2 },
   balancePreview: {
     marginTop: 12, padding: 12, borderRadius: 8, alignItems: 'center',
   },
