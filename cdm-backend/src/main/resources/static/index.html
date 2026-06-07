@@ -1,14 +1,506 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>cdm-web</title>
-    <script type="module" crossorigin src="/assets/index-LK3QPipJ.js"></script>
-    <link rel="stylesheet" crossorigin href="/assets/index-C49TDJbW.css">
-  </head>
-  <body>
-    <div id="root"></div>
-  </body>
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>CDM Cash Management System</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',Arial,sans-serif;background:#f0f2f5;color:#222}
+header{background:linear-gradient(135deg,#1a237e,#283593);color:#fff;padding:18px 28px}
+header h1{font-size:22px;font-weight:700}
+header p{font-size:13px;color:#9fa8da;margin-top:3px}
+nav{background:#fff;border-bottom:2px solid #e8eaf6;display:flex;padding:0 20px}
+.tab{background:none;border:none;padding:14px 22px;font-size:14px;font-weight:600;color:#888;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px}
+.tab:hover{color:#1a237e}
+.tab.active{color:#1a237e;border-bottom-color:#1a237e}
+main{max-width:1100px;margin:0 auto;padding:24px}
+.card{background:#fff;border-radius:12px;padding:20px;margin-bottom:16px;box-shadow:0 2px 8px rgba(0,0,0,.07)}
+.card-title{font-size:16px;font-weight:700;color:#1a237e;margin-bottom:16px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.machine{background:#fff;border-radius:12px;padding:20px;box-shadow:0 2px 8px rgba(0,0,0,.07);border-left:5px solid #ccc}
+.machine.ACTIVE{border-left-color:#43a047}
+.machine.LOW_CASH{border-left-color:#fb8c00}
+.machine.EMPTY{border-left-color:#e53935}
+.machine.REFILLING{border-left-color:#1e88e5}
+.m-code{font-size:18px;font-weight:800;color:#1a237e}
+.m-loc{font-size:13px;color:#777;margin:4px 0 12px}
+.m-bal{font-size:28px;font-weight:800}
+.m-bal.ACTIVE{color:#2e7d32}.m-bal.LOW_CASH{color:#e65100}.m-bal.EMPTY{color:#c62828}.m-bal.REFILLING{color:#1565c0}
+.prog{background:#eee;border-radius:4px;height:8px;margin:10px 0 6px;overflow:hidden}
+.prog-fill{height:100%;border-radius:4px;transition:width .4s}
+.fill-green{background:#43a047}.fill-orange{background:#fb8c00}.fill-red{background:#e53935}.fill-blue{background:#1e88e5}
+.badge{display:inline-block;padding:3px 10px;border-radius:20px;font-size:11px;font-weight:700;text-transform:uppercase;margin-top:8px}
+.badge.ACTIVE{background:#e8f5e9;color:#2e7d32}
+.badge.LOW_CASH{background:#fff3e0;color:#e65100}
+.badge.EMPTY{background:#ffebee;color:#c62828}
+.badge.REFILLING{background:#e3f2fd;color:#1565c0}
+.badge.MAINTENANCE{background:#f5f5f5;color:#555}
+.badge.PENDING{background:#fff3e0;color:#e65100}
+.badge.ACKNOWLEDGED{background:#e3f2fd;color:#1565c0}
+.badge.RESOLVED{background:#e8f5e9;color:#2e7d32}
+.badge.OPEN{background:#fff3e0;color:#e65100}
+.badge.IN_PROGRESS{background:#e3f2fd;color:#1565c0}
+.badge.COMPLETED{background:#e8f5e9;color:#2e7d32}
+.badge.SYSTEM{background:#ffebee;color:#c62828}
+.badge.CUSTOMER{background:#e3f2fd;color:#1565c0}
+btn,button.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;border-radius:8px;border:none;font-size:13px;font-weight:600;cursor:pointer;transition:all .2s}
+button.btn-primary{background:#1a237e;color:#fff}
+button.btn-primary:hover{background:#283593}
+button.btn-success{background:#2e7d32;color:#fff}
+button.btn-success:hover{background:#1b5e20}
+button.btn-danger{background:#c62828;color:#fff}
+button.btn-danger:hover{background:#b71c1c}
+button.btn-outline{background:#fff;color:#1a237e;border:2px solid #1a237e}
+button.btn-outline:hover{background:#e8eaf6}
+button.btn-sm{padding:5px 12px;font-size:12px}
+button:disabled{opacity:.6;cursor:not-allowed}
+.row{display:flex;gap:10px;align-items:center;justify-content:space-between;margin-bottom:14px}
+label{display:block;font-size:11px;font-weight:700;color:#888;text-transform:uppercase;margin-bottom:5px}
+input,select{width:100%;padding:10px 12px;border:1.5px solid #ddd;border-radius:8px;font-size:14px;outline:none;background:#fff}
+input:focus,select:focus{border-color:#1a237e}
+.form-group{margin-bottom:14px}
+.type-toggle{display:flex;gap:10px;margin-bottom:16px}
+.type-btn{flex:1;padding:12px;border-radius:10px;border:2px solid #ddd;background:#fff;font-size:14px;font-weight:700;cursor:pointer}
+.type-btn.sel-w{background:#c62828;color:#fff;border-color:#c62828}
+.type-btn.sel-d{background:#2e7d32;color:#fff;border-color:#2e7d32}
+.quick{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.qbtn{padding:6px 14px;border-radius:20px;border:1.5px solid #ddd;background:#fafafa;font-size:12px;font-weight:600;cursor:pointer}
+.qbtn:hover,.qbtn.active{background:#1a237e;color:#fff;border-color:#1a237e}
+.result{padding:12px 16px;border-radius:8px;margin:12px 0;border-left:4px solid}
+.result.ok{background:#e8f5e9;border-color:#43a047;color:#2e7d32}
+.result.err{background:#ffebee;border-color:#e53935;color:#c62828}
+.ws-bar{background:#e8f5e9;color:#2e7d32;padding:10px 16px;border-radius:8px;font-weight:600;font-size:13px;margin-bottom:16px;display:flex;align-items:center;gap:8px}
+.ws-bar.off{background:#fff3e0;color:#e65100}
+.dot{width:8px;height:8px;border-radius:50%;background:currentColor}
+.live-alert{background:#ffebee;border:1.5px solid #ef9a9a;color:#c62828;padding:12px 16px;border-radius:8px;margin-bottom:12px;font-weight:600}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{background:#f5f5f5;padding:10px 12px;text-align:left;font-weight:700;color:#555;border-bottom:2px solid #eee}
+td{padding:10px 12px;border-bottom:1px solid #f0f0f0;vertical-align:middle}
+tr:hover td{background:#fafafa}
+.over{position:fixed;inset:0;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;z-index:999}
+.modal{background:#fff;border-radius:16px;padding:28px;width:420px;max-width:95vw}
+.modal h3{font-size:18px;font-weight:700;color:#1a237e;margin-bottom:16px}
+.modal-foot{display:flex;gap:10px;margin-top:20px;justify-content:flex-end}
+.center{display:flex;align-items:center;justify-content:center;padding:60px;color:#888;font-size:15px}
+.spinner{width:32px;height:32px;border:4px solid #e8eaf6;border-top-color:#1a237e;border-radius:50%;animation:spin .8s linear infinite;margin-right:12px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.bal-box{padding:12px;border-radius:8px;text-align:center;margin-bottom:14px}
+.subtabs{display:flex;gap:8px;margin-bottom:16px}
+.hidden{display:none}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🏦 CDM Cash Management System</h1>
+  <p>Real-time Cash Deposit Machine Monitor — Chennai Branches</p>
+</header>
+
+<nav>
+  <button class="tab active" onclick="showTab('machines')">🏧 Machines</button>
+  <button class="tab" onclick="showTab('transaction')">💸 Transaction</button>
+  <button class="tab" onclick="showTab('management')">📊 Management</button>
+</nav>
+
+<main>
+
+<!-- ══════════ MACHINES ══════════ -->
+<div id="tab-machines">
+  <div class="row">
+    <span style="font-size:18px;font-weight:700;color:#1a237e">CDM Machines — Chennai</span>
+    <button class="btn btn-outline" onclick="loadMachines()">🔄 Refresh</button>
+  </div>
+  <div class="grid" id="machines-grid"><div class="center"><div class="spinner"></div>Loading...</div></div>
+</div>
+
+<!-- ══════════ TRANSACTION ══════════ -->
+<div id="tab-transaction" class="hidden" style="max-width:560px;margin:0 auto">
+  <div class="card">
+    <div class="card-title">Process Transaction</div>
+    <div class="type-toggle">
+      <button class="type-btn sel-w" id="btn-w" onclick="setType('WITHDRAWAL')">⬆️ Withdrawal</button>
+      <button class="type-btn" id="btn-d" onclick="setType('DEPOSIT')">⬇️ Deposit</button>
+    </div>
+    <div class="form-group">
+      <label>Select CDM Machine</label>
+      <select id="txn-machine"></select>
+    </div>
+    <div id="txn-bal-box" class="bal-box" style="background:#e8f5e9"></div>
+    <div class="form-group">
+      <label>Amount (₹)</label>
+      <input type="number" id="txn-amount" placeholder="0" style="font-size:22px;font-weight:800;text-align:center"/>
+    </div>
+    <div class="form-group">
+      <label>Quick Select</label>
+      <div class="quick" id="quick-btns"></div>
+    </div>
+    <div class="form-group">
+      <label>Account / Card Reference (optional)</label>
+      <input type="text" id="txn-ref" placeholder="e.g. XXXX1234"/>
+    </div>
+    <div id="txn-result"></div>
+    <button class="btn btn-danger" id="txn-submit" style="width:100%;padding:14px;font-size:15px" onclick="submitTxn()">⬆️ Withdraw Cash</button>
+  </div>
+</div>
+
+<!-- ══════════ MANAGEMENT ══════════ -->
+<div id="tab-management" class="hidden">
+  <div id="ws-bar" class="ws-bar off"><span class="dot"></span> Connecting to live alerts...</div>
+  <div id="live-alert" class="hidden live-alert"></div>
+  <div class="subtabs">
+    <button class="btn btn-primary btn-sm" onclick="showMgmt('alerts')">🔔 Alerts</button>
+    <button class="btn btn-outline btn-sm" onclick="showMgmt('refills')">📋 Refill Requests</button>
+    <button class="btn btn-outline btn-sm" onclick="showMgmt('load')">🏧 Machine Status</button>
+  </div>
+  <div id="mgmt-alerts">
+    <div class="card">
+      <div class="row"><span class="card-title" style="margin:0">All Alerts</span><button class="btn btn-outline btn-sm" onclick="loadAlerts()">🔄 Refresh</button></div>
+      <div id="alerts-body"><div class="center">Loading...</div></div>
+    </div>
+  </div>
+  <div id="mgmt-refills" class="hidden">
+    <div class="card">
+      <div class="row"><span class="card-title" style="margin:0">Refill Requests</span><button class="btn btn-outline btn-sm" onclick="loadRefills()">🔄 Refresh</button></div>
+      <div id="refills-body"><div class="center">Loading...</div></div>
+    </div>
+  </div>
+  <div id="mgmt-load" class="hidden">
+    <div class="card">
+      <div class="row"><span class="card-title" style="margin:0">Machine Status &amp; Cash Load</span><button class="btn btn-outline btn-sm" onclick="loadMgmtMachines()">🔄 Refresh</button></div>
+      <div id="load-body"><div class="center">Loading...</div></div>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<!-- REFILL REQUEST MODAL -->
+<div id="refill-modal" class="over hidden">
+  <div class="modal">
+    <h3>📢 Request Refill</h3>
+    <p id="refill-modal-loc" style="font-size:13px;color:#888;margin-bottom:16px"></p>
+    <div class="form-group"><label>Your Name *</label><input type="text" id="rm-name" placeholder="e.g. Ravi Kumar"/></div>
+    <div class="form-group"><label>Mobile Number</label><input type="text" id="rm-phone" placeholder="e.g. 9876543210"/></div>
+    <div class="form-group"><label>Account / Card Reference</label><input type="text" id="rm-acc" placeholder="e.g. XXXX1234"/></div>
+    <div id="rm-result"></div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" onclick="closeModal('refill-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="submitRefill()">Send Request</button>
+    </div>
+  </div>
+</div>
+
+<!-- CASH LOAD MODAL -->
+<div id="load-modal" class="over hidden">
+  <div class="modal">
+    <h3>💰 Load Cash</h3>
+    <p id="lm-title" style="font-size:13px;color:#888;margin-bottom:16px"></p>
+    <div style="background:#f5f5f5;border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:13px" id="lm-bal"></div>
+    <div class="form-group"><label>Cash Amount to Load (₹)</label><input type="number" id="lm-amt" placeholder="e.g. 400000"/></div>
+    <div class="form-group"><label>Handled By</label><input type="text" id="lm-by" value="Manager"/></div>
+    <div class="modal-foot">
+      <button class="btn btn-outline" onclick="closeModal('load-modal')">Cancel</button>
+      <button class="btn btn-success" onclick="submitLoad()">✅ Confirm Load</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = 'http://localhost:8080/api';
+let machines = [];
+let txnType = 'WITHDRAWAL';
+let refillMachine = null;
+let loadMachineObj = null;
+const QUICK = [5000,10000,20000,50000,100000];
+
+// ── helpers ──────────────────────────────────────────────
+const fmt = n => Number(n).toLocaleString('en-IN');
+const $  = id => document.getElementById(id);
+const el = (tag,html,cls) => { const e=document.createElement(tag); if(html)e.innerHTML=html; if(cls)e.className=cls; return e; };
+function closeModal(id){ $(id).classList.add('hidden'); }
+
+// ── tabs ─────────────────────────────────────────────────
+function showTab(name){
+  ['machines','transaction','management'].forEach(t=>{
+    $('tab-'+t).classList.toggle('hidden', t!==name);
+  });
+  document.querySelectorAll('.tab').forEach((b,i)=>{
+    b.classList.toggle('active', ['machines','transaction','management'][i]===name);
+  });
+  if(name==='transaction') loadTxnMachines();
+  if(name==='management'){ loadAlerts(); loadRefills(); loadMgmtMachines(); connectWS(); }
+}
+
+function showMgmt(name){
+  ['alerts','refills','load'].forEach(t=>{
+    $('mgmt-'+t).classList.toggle('hidden', t!==name);
+  });
+  document.querySelectorAll('.subtabs .btn').forEach((b,i)=>{
+    const n=['alerts','refills','load'][i];
+    b.className = 'btn btn-sm ' + (n===name?'btn-primary':'btn-outline');
+  });
+}
+
+// ── machines ─────────────────────────────────────────────
+async function loadMachines(){
+  try{
+    const r = await fetch(API+'/machines');
+    const d = await r.json();
+    machines = d.data||[];
+    renderMachines();
+  } catch(e){
+    $('machines-grid').innerHTML='<div class="center" style="color:#c62828">⚠️ Cannot connect to server. Make sure the server is running.</div>';
+  }
+}
+
+function fillClass(s){ return s==='ACTIVE'?'fill-green':s==='LOW_CASH'?'fill-orange':s==='EMPTY'?'fill-red':'fill-blue'; }
+
+function renderMachines(){
+  const g = $('machines-grid');
+  if(!machines.length){ g.innerHTML='<div class="center">No machines found</div>'; return; }
+  g.innerHTML='';
+  machines.forEach(m=>{
+    const pct = Math.round(m.currentBalance/m.totalCapacity*100);
+    const canReq = m.status==='LOW_CASH'||m.status==='EMPTY';
+    const div = document.createElement('div');
+    div.className='machine '+m.status;
+    div.innerHTML=`
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div><div class="m-code">${m.machineCode}</div><div class="m-loc">📍 ${m.location}</div></div>
+        <span class="badge ${m.status}">${m.status.replace('_',' ')}</span>
+      </div>
+      <div class="m-bal ${m.status}">₹${fmt(m.currentBalance)}</div>
+      <div style="font-size:12px;color:#999;margin-top:2px">of ₹${fmt(m.totalCapacity)} capacity</div>
+      <div class="prog"><div class="${fillClass(m.status)} prog-fill" style="width:${pct}%"></div></div>
+      <div style="font-size:12px;color:#aaa">${pct}% full · Low threshold: ₹${fmt(m.lowThreshold)}</div>
+      ${canReq?`<button class="btn btn-outline" style="margin-top:12px;width:100%" onclick="openRefillModal(${m.id},'${m.machineCode}','${m.location}')">📢 Request Refill</button>`:''}
+    `;
+    g.appendChild(div);
+  });
+}
+
+// ── transaction ───────────────────────────────────────────
+function setType(t){
+  txnType=t;
+  $('btn-w').className='type-btn'+(t==='WITHDRAWAL'?' sel-w':'');
+  $('btn-d').className='type-btn'+(t==='DEPOSIT'?' sel-d':'');
+  $('txn-submit').className='btn '+(t==='WITHDRAWAL'?'btn-danger':'btn-success');
+  $('txn-submit').style.width='100%'; $('txn-submit').style.padding='14px'; $('txn-submit').style.fontSize='15px';
+  $('txn-submit').textContent=t==='WITHDRAWAL'?'⬆️ Withdraw Cash':'⬇️ Deposit Cash';
+  updateBalBox();
+}
+
+async function loadTxnMachines(){
+  if(machines.length===0) await loadMachines();
+  const sel=$('txn-machine'); sel.innerHTML='';
+  machines.forEach(m=>{ const o=document.createElement('option'); o.value=m.machineCode; o.textContent=`${m.machineCode} — ${m.location}`; sel.appendChild(o); });
+  sel.onchange=updateBalBox;
+  // quick buttons
+  const qb=$('quick-btns'); qb.innerHTML='';
+  QUICK.forEach(q=>{ const b=document.createElement('button'); b.className='qbtn'; b.textContent='₹'+fmt(q); b.onclick=()=>{ $('txn-amount').value=q; document.querySelectorAll('.qbtn').forEach(x=>x.classList.remove('active')); b.classList.add('active'); }; qb.appendChild(b); });
+  updateBalBox();
+}
+
+function updateBalBox(){
+  const code=$('txn-machine').value;
+  const m=machines.find(x=>x.machineCode===code);
+  if(!m){ $('txn-bal-box').innerHTML=''; return; }
+  const bg=m.status==='ACTIVE'?'#e8f5e9':m.status==='LOW_CASH'?'#fff8e1':'#ffebee';
+  const col=m.status==='ACTIVE'?'#2e7d32':m.status==='LOW_CASH'?'#e65100':'#c62828';
+  $('txn-bal-box').style.background=bg;
+  $('txn-bal-box').innerHTML=`<div style="font-size:11px;color:#888">Available Cash</div><div style="font-size:26px;font-weight:800;color:${col}">₹${fmt(m.currentBalance)}</div><span class="badge ${m.status}">${m.status.replace('_',' ')}</span>`;
+}
+
+async function submitTxn(){
+  const amt=parseFloat($('txn-amount').value);
+  if(!amt||amt<=0){ alert('Please enter a valid amount.'); return; }
+  const code=$('txn-machine').value;
+  if(!code){ alert('Please select a machine.'); return; }
+  $('txn-submit').disabled=true; $('txn-submit').textContent='Processing...';
+  $('txn-result').innerHTML='';
+  try{
+    const r=await fetch(API+'/transactions',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({machineCode:code,type:txnType,amount:amt,customerReference:$('txn-ref').value||undefined})});
+    const d=await r.json();
+    if(!r.ok) throw new Error(d.message||'Failed');
+    const t=d.data;
+    $('txn-result').innerHTML=`<div class="result ok">✅ <strong>Transaction Successful</strong> — ${t.type} of ₹${fmt(t.amount)} · New balance: ₹${fmt(t.balanceAfter)}</div>`;
+    $('txn-amount').value=''; $('txn-ref').value='';
+    await loadMachines(); updateBalBox();
+  } catch(e){
+    $('txn-result').innerHTML=`<div class="result err">❌ ${e.message}</div>`;
+  } finally{
+    setType(txnType);
+    $('txn-submit').disabled=false;
+  }
+}
+
+// ── management ────────────────────────────────────────────
+async function loadAlerts(){
+  try{
+    const r=await fetch(API+'/alerts');
+    const d=await r.json();
+    const list=d.data||[];
+    if(!list.length){ $('alerts-body').innerHTML='<div class="center">✅ No alerts</div>'; return; }
+    let h='<div style="overflow-x:auto"><table><thead><tr><th>Machine</th><th>Type</th><th>Status</th><th>Time</th><th>Action</th></tr></thead><tbody>';
+    list.forEach(a=>{
+      h+=`<tr>
+        <td><strong>${a.machine?.machineCode}</strong><br><small style="color:#888">${a.machine?.location}</small></td>
+        <td><span class="badge ${a.alertType}">${a.alertType}</span></td>
+        <td><span class="badge ${a.status}">${a.status}</span></td>
+        <td style="font-size:12px;color:#888">${new Date(a.createdAt).toLocaleString('en-IN')}</td>
+        <td>
+          ${a.status==='PENDING'?`<button class="btn btn-outline btn-sm" onclick="ackAlert(${a.id})" style="margin-right:4px">Acknowledge</button>`:''}
+          ${a.status!=='RESOLVED'?`<button class="btn btn-success btn-sm" onclick="resolveAlert(${a.id})">Resolve</button>`:''}
+        </td>
+      </tr>`;
+    });
+    h+='</tbody></table></div>';
+    $('alerts-body').innerHTML=h;
+  } catch(e){ $('alerts-body').innerHTML='<div class="center" style="color:#c62828">Error loading alerts</div>'; }
+}
+
+async function ackAlert(id){
+  await fetch(API+'/alerts/'+id+'/acknowledge?handledBy=Manager',{method:'PATCH'});
+  loadAlerts();
+}
+async function resolveAlert(id){
+  await fetch(API+'/alerts/'+id+'/resolve?handledBy=Manager',{method:'PATCH'});
+  loadAlerts();
+}
+
+async function loadRefills(){
+  try{
+    const r=await fetch(API+'/refill-requests');
+    const d=await r.json();
+    const list=d.data||[];
+    if(!list.length){ $('refills-body').innerHTML='<div class="center">✅ No open refill requests</div>'; return; }
+    let h='<div style="overflow-x:auto"><table><thead><tr><th>Machine</th><th>Requested By</th><th>Customer</th><th>Status</th><th>Time</th><th>Action</th></tr></thead><tbody>';
+    list.forEach(r=>{
+      h+=`<tr>
+        <td><strong>${r.machine?.machineCode}</strong><br><small style="color:#888">${r.machine?.location}</small></td>
+        <td><span class="badge ${r.requestedBy}">${r.requestedBy}</span></td>
+        <td>${r.customerName||'—'}<br><small style="color:#aaa">${r.customerContact||''}</small></td>
+        <td><span class="badge ${r.status}">${r.status.replace('_',' ')}</span></td>
+        <td style="font-size:12px;color:#888">${new Date(r.createdAt).toLocaleString('en-IN')}</td>
+        <td>
+          ${r.status==='OPEN'?`<button class="btn btn-outline btn-sm" onclick="startRefill(${r.id})" style="margin-right:4px">Start</button>`:''}
+          ${r.status!=='COMPLETED'&&r.status!=='CANCELLED'?`<button class="btn btn-success btn-sm" onclick="completeRefill(${r.id})">Complete</button>`:''}
+        </td>
+      </tr>`;
+    });
+    h+='</tbody></table></div>';
+    $('refills-body').innerHTML=h;
+  } catch(e){ $('refills-body').innerHTML='<div class="center" style="color:#c62828">Error loading refill requests</div>'; }
+}
+
+async function startRefill(id){ await fetch(API+'/refill-requests/'+id+'/status?status=IN_PROGRESS&handledBy=Manager',{method:'PATCH'}); loadRefills(); }
+async function completeRefill(id){ await fetch(API+'/refill-requests/'+id+'/status?status=COMPLETED&handledBy=Manager',{method:'PATCH'}); loadRefills(); }
+
+async function loadMgmtMachines(){
+  await loadMachines();
+  if(!machines.length){ $('load-body').innerHTML='<div class="center">No machines</div>'; return; }
+  let h='<div style="overflow-x:auto"><table><thead><tr><th>Machine</th><th>Location</th><th>Balance</th><th>Capacity</th><th>Status</th><th>Action</th></tr></thead><tbody>';
+  machines.forEach(m=>{
+    const col=m.status==='ACTIVE'?'#2e7d32':m.status==='LOW_CASH'?'#e65100':'#c62828';
+    h+=`<tr>
+      <td><strong>${m.machineCode}</strong></td>
+      <td>${m.location}</td>
+      <td style="font-weight:700;color:${col}">₹${fmt(m.currentBalance)}</td>
+      <td>₹${fmt(m.totalCapacity)}</td>
+      <td><span class="badge ${m.status}">${m.status.replace('_',' ')}</span></td>
+      <td><button class="btn btn-primary btn-sm" onclick="openLoadModal(${JSON.stringify(m).replace(/"/g,'&quot;')})">💰 Load Cash</button></td>
+    </tr>`;
+  });
+  h+='</tbody></table></div>';
+  $('load-body').innerHTML=h;
+}
+
+// ── refill modal ──────────────────────────────────────────
+function openRefillModal(id,code,loc){
+  refillMachine={id,code,loc};
+  $('refill-modal-loc').textContent=code+' — '+loc;
+  $('rm-name').value=''; $('rm-phone').value=''; $('rm-acc').value=''; $('rm-result').innerHTML='';
+  $('refill-modal').classList.remove('hidden');
+}
+async function submitRefill(){
+  if(!$('rm-name').value.trim()){ alert('Please enter your name.'); return; }
+  try{
+    await fetch(API+'/refill-requests/customer',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({machineCode:refillMachine.code,customerName:$('rm-name').value,customerContact:$('rm-phone').value,customerAccountRef:$('rm-acc').value})});
+    $('rm-result').innerHTML='<div class="result ok">✅ Request sent to management!</div>';
+    setTimeout(()=>closeModal('refill-modal'),1500);
+  } catch(e){ $('rm-result').innerHTML='<div class="result err">❌ Failed. Try again.</div>'; }
+}
+
+// ── cash load modal ───────────────────────────────────────
+function openLoadModal(m){
+  loadMachineObj=m;
+  $('lm-title').textContent=m.machineCode+' — '+m.location;
+  $('lm-bal').innerHTML='Current balance: <strong>₹'+fmt(m.currentBalance)+'</strong>';
+  $('lm-amt').value=''; $('load-modal').classList.remove('hidden');
+}
+async function submitLoad(){
+  const amt=parseFloat($('lm-amt').value);
+  if(!amt||amt<=0){ alert('Enter a valid amount.'); return; }
+  try{
+    await fetch(API+'/machines/'+loadMachineObj.id+'/complete-refill',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({amount:amt,handledBy:$('lm-by').value||'Manager'})});
+    closeModal('load-modal');
+    await loadMachines(); loadMgmtMachines(); loadAlerts();
+    alert('✅ Cash loaded successfully!');
+  } catch(e){ alert('Failed: '+e.message); }
+}
+
+// ── websocket ─────────────────────────────────────────────
+function connectWS(){
+  try{
+    const sock=new EventSource(null); // dummy — use polling fallback
+  } catch(e){}
+  // SockJS + STOMP
+  const script=document.createElement('script');
+  script.src='https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js';
+  script.onload=()=>{
+    const script2=document.createElement('script');
+    script2.src='https://cdn.jsdelivr.net/npm/@stomp/stompjs@7/bundles/stomp.umd.min.js';
+    script2.onload=initStomp;
+    document.head.appendChild(script2);
+  };
+  document.head.appendChild(script);
+}
+
+function initStomp(){
+  try{
+    const client=new StompJs.Client({
+      webSocketFactory:()=>new SockJS('http://localhost:8080/ws'),
+      reconnectDelay:5000,
+      onConnect:()=>{
+        $('ws-bar').className='ws-bar';
+        $('ws-bar').innerHTML='<span class="dot"></span> Live — WebSocket connected. Alerts arrive in real-time.';
+        client.subscribe('/topic/alerts',m=>{
+          const p=JSON.parse(m.body);
+          showLiveAlert('🚨 ALERT: '+(p.message||p.alertType||'New alert received'));
+          loadAlerts();
+        });
+        client.subscribe('/topic/refill-requests',m=>{
+          showLiveAlert('📋 New refill request received');
+          loadRefills();
+        });
+      }
+    });
+    client.activate();
+  } catch(e){ console.log('WS error',e); }
+}
+
+function showLiveAlert(msg){
+  const d=$('live-alert');
+  d.textContent=msg; d.classList.remove('hidden');
+  setTimeout(()=>d.classList.add('hidden'),5000);
+}
+
+// ── init ──────────────────────────────────────────────────
+loadMachines();
+setInterval(loadMachines, 10000);
+</script>
+</body>
 </html>
